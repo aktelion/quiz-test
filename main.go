@@ -27,18 +27,18 @@ func main() {
 	svc := dynamodb.New(sess)
 
 	listTables(svc)
-	allMusic(svc)
-	fmt.Println("==============")
-	getMusic(svc, "No One You Know", "Call Me Today")
-	music := &Music{
-		Artist:    "The Big New Movie",
-		SongTitle: "Nothing happens at all.",
-	}
-	fmt.Println()
-	createItem(svc, music)
-	getMusic(svc, music.Artist, music.SongTitle)
-	//updateItem(svc, music, "Call")
-	deleteItem(svc, music.Artist, "Call")
+	//allMusic(svc)
+	//fmt.Println("==============")
+	//getMusic(svc, "No One You Know", "Call Me Today")
+	//music := &Music{
+	//	Artist:    "The Big New Movie",
+	//	SongTitle: "Nothing happens at all.",
+	//}
+	//fmt.Println()
+	//createItem(svc, music)
+	//getMusic(svc, music.Artist, music.SongTitle)
+	////updateItem(svc, music, "Call")
+	//deleteItem(svc, music.Artist, "Call")
 }
 
 func listTables(svc *dynamodb.DynamoDB) {

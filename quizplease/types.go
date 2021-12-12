@@ -24,8 +24,15 @@ type Game struct {
 }
 
 type Team struct {
-	Schedule Schedule `json:"schedule"`
-	Rating   Rating   `json:"rating"`
+	Name     string   `json:"name,omitempty"`
+	Schedule Schedule `json:"schedule" json:"schedule"`
+	Rating   Rating   `json:"rating" json:"rating"`
+}
+
+type Place struct {
+	Label   string
+	Address string
+	Filter  bool
 }
 
 type Rank struct {
