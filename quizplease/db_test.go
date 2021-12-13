@@ -1,96 +1,11 @@
 package quizplease
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"reflect"
 	"testing"
 	"time"
 )
-
-func TestListGames(t *testing.T) {
-	type args struct {
-		svc *dynamodb.DynamoDB
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    []Game
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := ListGames(tt.args.svc)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ListGames() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ListGames() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestListPlaces(t *testing.T) {
-	type args struct {
-		svc *dynamodb.DynamoDB
-	}
-	tests := []struct {
-		name string
-		args args
-		want []Place
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := ListPlaces(tt.args.svc); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ListPlaces() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestNewRank(t *testing.T) {
-	type args struct {
-		scores float32
-	}
-	tests := []struct {
-		name string
-		args args
-		want Rank
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewRank(tt.args.scores); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewRank() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestStoreGame(t *testing.T) {
-	type args struct {
-		svc  *dynamodb.DynamoDB
-		game *Game
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-		})
-	}
-}
 
 func TestCreateDelete(t *testing.T) {
 	svc := getService()
@@ -105,25 +20,28 @@ func TestCreateDelete(t *testing.T) {
 	StoreGame(svc, &game)
 	got_game, err := GetGame(svc, game.Id)
 	if err != nil {
-		panic("Hasn't store the game")
+		t.Errorf("Hasn't store the game")
 	}
 
 	if *got_game != game {
-		panic("loaded game differs")
+		t.Errorf("loaded game differs")
 	}
 
 	err = DeleteGame(svc, game.Id)
 	if err != nil {
-		panic("Can't delete game")
+		t.Errorf("Can't delete game")
 	}
 }
 
-func TestStoreAndListPlaces(t *testing.T) {
+func TestStoreAndListGames(t *testing.T) {
 	svc := getService()
 	ClearGames(svc)
+
+	firstId := uint64(1)
+
 	games := []Game{
 		{
-			Id:     1,
+			Id:     firstId,
 			Number: 1,
 			Title:  "First",
 			Place:  "Mordor",
@@ -153,23 +71,28 @@ func TestStoreAndListPlaces(t *testing.T) {
 	}
 
 	for _, game := range games {
-		StoreGame(svc, &game)
+		err := StoreGame(svc, &game)
+		if err != nil {
+			t.Errorf("Can't store game: %v", game)
+		}
 	}
 
-	game, err := GetGame(svc, 5)
+	game, err := GetGame(svc, firstId)
 	if err != nil {
-		panic("Can't get the game")
+		t.Errorf("Can't get the game: %d", 5)
 	}
 
-	fmt.Printf("The game is %v", game)
+	if game.Id != firstId {
+		t.Errorf("Got strange game: %v", game)
+	}
 
 	got_games, err := ListGames(svc)
 	if err != nil {
-		panic("Can't list games")
+		t.Errorf("Can't list games")
 	}
 
 	if len(got_games) != len(games) {
-		panic("not the same amount of the games")
+		t.Errorf("not the same amount of the games")
 	}
 
 	for i := 0; i < len(got_games); i++ {
@@ -181,20 +104,59 @@ func TestStoreAndListPlaces(t *testing.T) {
 			}
 		}
 		if !found {
-			panic("Games are not equal")
+			t.Errorf("Games are not equal")
 		}
 	}
 }
 
-func TestStorePlace(t *testing.T) {
-	//svc := getService()
-	tests := []struct {
-		name  string
-		place *Place
-	}{}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-		})
+func TestStoreAndListPlaces(t *testing.T) {
+	svc := getService()
+	err := ClearPlaces(svc)
+	if err != nil {
+		t.Errorf("Can't clear places")
+	}
+	places := []Place{
+		{
+			Label:   "first place",
+			Address: "Somewhere near us",
+		},
+		{
+			Label:   "second place",
+			Address: "Far from here",
+		},
+		{
+			Label:    "another fucking place",
+			Address:  "Disgusting place",
+			Unwanted: true,
+		},
+	}
+
+	for _, place := range places {
+		err := StorePlace(svc, &place)
+		if err != nil {
+			t.Errorf("Can't store places")
+		}
+	}
+
+	got_places, err := ListPlaces(svc)
+	if err != nil {
+		t.Errorf("Can't list places")
+	}
+
+	if len(places) != len(got_places) {
+		t.Fatalf("Places lengths aren't equal. Stored: %d, got: %d", len(places), len(got_places))
+	}
+
+	for i := 0; i < len(places); i++ {
+		found := false
+		for j := 0; j < len(got_places); j++ {
+			if places[i] == got_places[j] {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("Can't find associated place for %v", places[i])
+		}
 	}
 }
 

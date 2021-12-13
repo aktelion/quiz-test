@@ -30,9 +30,9 @@ type Team struct {
 }
 
 type Place struct {
-	Label   string
-	Address string
-	Filter  bool
+	Label    string `json:"label,omitempty"`
+	Address  string `json:"address,omitempty"`
+	Unwanted bool   `json:"unwanted,omitempty"`
 }
 
 type Rank struct {
