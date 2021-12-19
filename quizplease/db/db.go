@@ -1,6 +1,7 @@
-package quizplease
+package db
 
 import (
+	"github.com/aktelion/quiz-test/quizplease"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -14,7 +15,7 @@ const (
 	RatingTableName = "Rating"
 )
 
-func StorePlace(svc *dynamodb.DynamoDB, place *Place) error {
+func StorePlace(svc *dynamodb.DynamoDB, place *quizplease.Place) error {
 	pl, err := dynamodbattribute.MarshalMap(place)
 	if err != nil {
 		log.Println("Can't marshal game " + err.Error())
@@ -32,11 +33,11 @@ func StorePlace(svc *dynamodb.DynamoDB, place *Place) error {
 	return nil
 }
 
-func ListPlaces(svc *dynamodb.DynamoDB) ([]Place, error) {
+func ListPlaces(svc *dynamodb.DynamoDB) ([]quizplease.Place, error) {
 	return ListPlacesFiltered(svc, false)
 }
 
-func ListPlacesFiltered(svc *dynamodb.DynamoDB, filterUnwanted bool) ([]Place, error) {
+func ListPlacesFiltered(svc *dynamodb.DynamoDB, filterUnwanted bool) ([]quizplease.Place, error) {
 	input := dynamodb.ScanInput{
 		TableName: aws.String(PlacesTableName),
 	}
@@ -47,10 +48,10 @@ func ListPlacesFiltered(svc *dynamodb.DynamoDB, filterUnwanted bool) ([]Place, e
 		return nil, err
 	}
 
-	result := make([]Place, 0, len(res.Items))
+	result := make([]quizplease.Place, 0, len(res.Items))
 
 	for _, i := range res.Items {
-		place := Place{}
+		place := quizplease.Place{}
 		err := dynamodbattribute.UnmarshalMap(i, &place)
 		if err != nil {
 			log.Println("Can't unmarshal map" + err.Error())
@@ -97,7 +98,7 @@ func DeletePlace(svc *dynamodb.DynamoDB, label string) error {
 	return nil
 }
 
-func StoreGame(svc *dynamodb.DynamoDB, game *Game) error {
+func StoreGame(svc *dynamodb.DynamoDB, game *quizplease.Game) error {
 	gm, err := dynamodbattribute.MarshalMap(game)
 	if err != nil {
 		log.Println("Can't marshal game " + err.Error())
@@ -115,7 +116,7 @@ func StoreGame(svc *dynamodb.DynamoDB, game *Game) error {
 	return nil
 }
 
-func GetGame(svc *dynamodb.DynamoDB, id uint64) (*Game, error) {
+func GetGame(svc *dynamodb.DynamoDB, id uint64) (*quizplease.Game, error) {
 	item, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(GamesTableName),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -129,7 +130,7 @@ func GetGame(svc *dynamodb.DynamoDB, id uint64) (*Game, error) {
 		log.Println("Can't get the game " + err.Error())
 		return nil, err
 	}
-	game := Game{}
+	game := quizplease.Game{}
 	err = dynamodbattribute.UnmarshalMap(item.Item, &game)
 	if err != nil {
 		log.Println("Can't unmarshal game " + err.Error())
@@ -170,7 +171,7 @@ func ClearGames(svc *dynamodb.DynamoDB) error {
 	return nil
 }
 
-func ListGames(svc *dynamodb.DynamoDB) ([]Game, error) {
+func ListGames(svc *dynamodb.DynamoDB) ([]quizplease.Game, error) {
 	res, err := svc.Scan(&dynamodb.ScanInput{
 		TableName: aws.String(GamesTableName),
 	})
@@ -179,9 +180,9 @@ func ListGames(svc *dynamodb.DynamoDB) ([]Game, error) {
 		return nil, err
 	}
 
-	result := make([]Game, 0, *res.Count)
+	result := make([]quizplease.Game, 0, *res.Count)
 	for _, item := range res.Items {
-		game := Game{}
+		game := quizplease.Game{}
 		err := dynamodbattribute.UnmarshalMap(item, &game)
 		if err != nil {
 			log.Println("Can't unmarshal map to game " + err.Error())

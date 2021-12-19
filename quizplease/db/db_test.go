@@ -1,6 +1,7 @@
-package quizplease
+package db
 
 import (
+	"github.com/aktelion/quiz-test/quizplease"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"testing"
@@ -9,7 +10,7 @@ import (
 
 func TestCreateDelete(t *testing.T) {
 	svc := getService()
-	game := Game{
+	game := quizplease.Game{
 		Id:     100,
 		Number: 1,
 		Title:  "First",
@@ -39,7 +40,7 @@ func TestStoreAndListGames(t *testing.T) {
 
 	firstId := uint64(1)
 
-	games := []Game{
+	games := []quizplease.Game{
 		{
 			Id:     firstId,
 			Number: 1,
@@ -115,7 +116,7 @@ func TestStoreAndListPlaces(t *testing.T) {
 	if err != nil {
 		t.Errorf("Can't clear places")
 	}
-	places := []Place{
+	places := []quizplease.Place{
 		{
 			Label:   "first place",
 			Address: "Somewhere near us",
