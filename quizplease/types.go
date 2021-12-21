@@ -1,9 +1,5 @@
 package quizplease
 
-import (
-	"time"
-)
-
 type Rating struct {
 	SeasonGames  int32   `json:"season_games,omitempty"`
 	AllGames     int32   `json:"all_games,omitempty"`
@@ -16,11 +12,11 @@ type Schedule struct {
 }
 
 type Game struct {
-	Id     uint64    `json:"id,omitempty"`
-	Number uint64    `json:"number,omitempty"`
-	Title  string    `json:"title,omitempty"`
-	Place  string    `json:"place,omitempty"`
-	Date   time.Time `json:"date,omitempty"`
+	Id     uint64 `json:"id,omitempty"`
+	Number uint64 `json:"number,omitempty"`
+	Title  string `json:"title,omitempty"`
+	Place  string `json:"place,omitempty"`
+	Date   string `json:"date,omitempty"`
 }
 
 type Team struct {

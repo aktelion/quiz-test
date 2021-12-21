@@ -48,6 +48,7 @@ func ParseSchedule(url string) []quizplease.Game {
 		extractTitle(el, &game)
 		extractId(el, &game)
 		extractPlace(el, &game)
+		extractDate(el, &game)
 		res = append(res, game)
 	})
 
@@ -76,35 +77,15 @@ func extractId(el *goquery.Selection, game *quizplease.Game) {
 	game.Id = uint64(gameId)
 }
 
-//fn parse_game(game_block: ElementRef) -> Game {
-//    let title_and_number_selector = Selector::parse(".h2.h2-game-card").unwrap();
-//    let place_sel = Selector::parse(".schedule-block-info-bar").unwrap();
-//    let schedule_info_block_sel = Selector::parse(".schedule-info-block").unwrap();
-//    let schedule_info_sel = Selector::parse(".schedule-info").unwrap();
-//    let tech_text_sel = Selector::parse(".techtext").unwrap();
-//
-//    let id: i32 = game_block.value().attr("id").unwrap().trim().parse().unwrap();
-//    let mut title_and_number_block = game_block.select(&title_and_number_selector);
-//    let title = title_and_number_block.next().unwrap().inner_html().trim().to_string();
-//    let number: i32 = title_and_number_block.next().unwrap().inner_html().trim()[1..].parse().unwrap();
-//
-//    let place = match game_block.select(&place_sel).next() {
-//        Some(p) => { p.text().next().unwrap().trim().to_string() }
-//        None => "".to_string()
-//    };
-//
-//    let mut date = String::new();
-//    date += game_block.children().skip(1).next().unwrap().children().next().unwrap().value().as_text().unwrap();
-//    date += ", ";
-//    if !place.is_empty() {
-//        date += game_block.select(&schedule_info_block_sel).next().unwrap()
-//            .select(&schedule_info_sel).skip(1).next().unwrap()
-//            .select(&tech_text_sel).next().unwrap()
-//            .text().next().unwrap().trim();
-//    } else { // Stream games have a little bit different structure - there's no place, nothing to skip.
-//        date += game_block.select(&schedule_info_block_sel).next().unwrap()
-//            .select(&schedule_info_sel).next().unwrap()
-//            .select(&tech_text_sel).next().unwrap()
-//            .text().next().unwrap().trim();
-//    }
-//    Game { id, number, title, place: Place::new(&place), date, available: true, game_type: GameType::Classic }
+func extractDate(el *goquery.Selection, game *quizplease.Game) {
+	date := el.Find(".h3-mb10").Text()
+	var time string
+	scheduleInfoBlock := el.Find(".schedule-block-top").Find(".schedule-info-block")
+	timePosition := scheduleInfoBlock.Children().Length() - 2
+	scheduleInfoBlock.Children().Each(func(i int, s *goquery.Selection) {
+		if i == timePosition {
+			time = strings.Split(strings.TrimSpace(s.Text()), " ")[1]
+		}
+	})
+	game.Date = date + " " + time
+}
