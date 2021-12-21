@@ -2,6 +2,7 @@ package site_grabber
 
 import (
 	"fmt"
+	"github.com/aktelion/quiz-test/quizplease"
 	"testing"
 )
 
@@ -9,8 +10,15 @@ const RatingUrl = "https://moscow.quizplease.ru/rating?QpRaitingSearch%5Bgeneral
 const ScheduleUrl = "https://moscow.quizplease.ru/schedule"
 const BookUrl = "https://quizplease.ru/game-page?id="
 
-func Test_getDocument(t *testing.T) {
-	schedule := ParseSchedule(ScheduleUrl)
+func TestAll(t *testing.T) {
+	rating, _ := ParseRating(RatingUrl)
+	team := quizplease.Team{
+		Name: "Имбирная Камбала",
+		Rank: quizplease.NewRank(rating.AllScores),
+	}
+	fmt.Printf("Team is %v\n\n", team)
+
+	schedule, _ := ParseSchedule(ScheduleUrl)
 	for _, game := range schedule {
 		fmt.Printf("Game is: %v\n", game)
 	}

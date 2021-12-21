@@ -1,10 +1,10 @@
 package quizplease
 
 type Rating struct {
-	SeasonGames  int32   `json:"season_games,omitempty"`
-	AllGames     int32   `json:"all_games,omitempty"`
-	SeasonScores float32 `json:"season_scores,omitempty"`
-	AllScores    float32 `json:"all_scores,omitempty"`
+	SeasonGames  uint64  `json:"season_games,omitempty"`
+	AllGames     uint64  `json:"all_games,omitempty"`
+	SeasonScores float64 `json:"season_scores,omitempty"`
+	AllScores    float64 `json:"all_scores,omitempty"`
 }
 
 type Schedule struct {
@@ -20,9 +20,8 @@ type Game struct {
 }
 
 type Team struct {
-	Name     string   `json:"name,omitempty"`
-	Schedule Schedule `json:"schedule" json:"schedule"`
-	Rating   Rating   `json:"rating" json:"rating"`
+	Name string `json:"name,omitempty"`
+	Rank Rank   `json:"rank"`
 }
 
 type Place struct {
@@ -33,7 +32,7 @@ type Place struct {
 
 type Rank struct {
 	Name   string  `json:"name,omitempty"`
-	Scores float32 `json:"scores,omitempty"`
+	Scores float64 `json:"scores,omitempty"`
 	Label  string  `json:"label,omitempty"`
 }
 
@@ -48,11 +47,14 @@ var ranks = []Rank{
 	{Name: "Legend", Label: "Легенда", Scores: 10000},
 }
 
-func NewRank(scores float32) Rank {
+func NewRank(scores float64) Rank {
+	prevRank := ranks[len(ranks)-1]
 	for i, rank := range ranks {
 		if scores < rank.Scores {
-			return ranks[i-1]
+			prevRank = ranks[i-1]
+			break
 		}
 	}
-	return ranks[len(ranks)-1]
+
+	return Rank{prevRank.Name, scores, prevRank.Label}
 }
