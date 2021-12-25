@@ -116,7 +116,7 @@ func StoreGame(svc *dynamodb.DynamoDB, game *quizplease.Game) error {
 	return nil
 }
 
-func GetGame(svc *dynamodb.DynamoDB, id uint64) (*quizplease.Game, error) {
+func GetGame(svc *dynamodb.DynamoDB, id uint) (*quizplease.Game, error) {
 	item, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(GamesTableName),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -139,7 +139,7 @@ func GetGame(svc *dynamodb.DynamoDB, id uint64) (*quizplease.Game, error) {
 	return &game, nil
 }
 
-func DeleteGame(svc *dynamodb.DynamoDB, id uint64) error {
+func DeleteGame(svc *dynamodb.DynamoDB, id uint) error {
 	_, err := svc.DeleteItem(&dynamodb.DeleteItemInput{
 		TableName: aws.String(GamesTableName),
 		Key: map[string]*dynamodb.AttributeValue{

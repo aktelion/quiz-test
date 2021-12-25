@@ -22,7 +22,7 @@ func ParseRating(url string) (*quizplease.Rating, error) {
 	scoresStr := strings.Split(doc.Find(".rating-table-points").Text(), " ")[1]
 	scores, _ := strconv.ParseFloat(scoresStr, 32)
 
-	return &quizplease.Rating{0, games, 0, scores}, nil
+	return &quizplease.Rating{0, uint(games), 0, scores}, nil
 }
 
 func getDocument(url string) (*goquery.Document, error) {
@@ -77,7 +77,11 @@ func extractTitleAndNumber(el *goquery.Selection, game *quizplease.Game) {
 	tnEl := el.Find(".h2.h2-game-card").Text()
 	tn := strings.Split(tnEl, "#")
 	game.Title = tn[0]
-	game.Number, _ = strconv.ParseUint(tn[1], 10, 64)
+	num, err := strconv.ParseUint(tn[1], 10, 64)
+	if err != nil {
+		num = 0
+	}
+	game.Number = uint(num)
 }
 
 func extractId(el *goquery.Selection, game *quizplease.Game) {
@@ -89,7 +93,7 @@ func extractId(el *goquery.Selection, game *quizplease.Game) {
 	if err != nil {
 		gameId = 0
 	}
-	game.Id = uint64(gameId)
+	game.Id = uint(gameId)
 }
 
 func extractDate(el *goquery.Selection, game *quizplease.Game) {

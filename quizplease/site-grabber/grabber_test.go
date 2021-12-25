@@ -13,8 +13,9 @@ const BookUrl = "https://quizplease.ru/game-page?id="
 func TestAll(t *testing.T) {
 	rating, _ := ParseRating(RatingUrl)
 	team := quizplease.Team{
-		Name: "Имбирная Камбала",
-		Rank: quizplease.NewRank(rating.AllScores),
+		Name:   "Имбирная Камбала",
+		Rank:   quizplease.NewRank(rating.AllScores),
+		Rating: *rating,
 	}
 	fmt.Printf("Team is %v\n\n", team)
 

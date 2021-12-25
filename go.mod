@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/aws/aws-sdk-go v1.42.22
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 )
 
 require (

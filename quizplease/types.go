@@ -1,8 +1,10 @@
 package quizplease
 
+import "strings"
+
 type Rating struct {
-	SeasonGames  uint64  `json:"season_games,omitempty"`
-	AllGames     uint64  `json:"all_games,omitempty"`
+	SeasonGames  uint    `json:"season_games,omitempty"`
+	AllGames     uint    `json:"all_games,omitempty"`
 	SeasonScores float64 `json:"season_scores,omitempty"`
 	AllScores    float64 `json:"all_scores,omitempty"`
 }
@@ -11,17 +13,39 @@ type Schedule struct {
 	Games []Game `json:"games,omitempty"`
 }
 
+const OnlinePostfix = "[стрим]"
+
 type Game struct {
-	Id     uint64 `json:"id,omitempty"`
-	Number uint64 `json:"number,omitempty"`
+	Id     uint   `json:"id,omitempty"`
+	Number uint   `json:"number,omitempty"`
 	Title  string `json:"title,omitempty"`
 	Place  string `json:"place,omitempty"`
 	Date   string `json:"date,omitempty"`
 }
 
+func (game *Game) IsOnline() bool {
+	return strings.Contains(game.Title, OnlinePostfix)
+}
+
+func (game *Game) IsSubject() bool {
+	return strings.Contains(game.Title, "[")
+}
+
+func (game *Game) Need(filter *GameFilter) bool {
+	return !(filter.FilterOnline && game.IsOnline()) &&
+		!(filter.FilterSubject && game.IsSubject())
+}
+
+type GameFilter struct {
+	FilterOnline         bool
+	FilterSubject        bool
+	FilterUnwantedPlaces bool // not used
+}
+
 type Team struct {
-	Name string `json:"name,omitempty"`
-	Rank Rank   `json:"rank"`
+	Name   string `json:"name,omitempty"`
+	Rank   Rank   `json:"rank"`
+	Rating Rating `json:"rating"`
 }
 
 type Place struct {

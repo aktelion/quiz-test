@@ -38,7 +38,7 @@ func TestStoreAndListGames(t *testing.T) {
 	svc := getService()
 	ClearGames(svc)
 
-	firstId := uint64(1)
+	firstId := uint(1)
 
 	games := []quizplease.Game{
 		{
